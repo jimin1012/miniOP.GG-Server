@@ -6,4 +6,6 @@ public interface AccountService {
 
 	void accountPuuid(Summoner summoner, String puuid);
 
+	Summoner getSummonerPuuid(String nickName, String tag);
+
 }

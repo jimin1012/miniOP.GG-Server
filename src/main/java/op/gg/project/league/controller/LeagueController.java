@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
@@ -22,6 +23,7 @@ import op.gg.project.account.model.dto.Account;
 import op.gg.project.account.model.service.AccountService;
 import op.gg.project.league.model.dto.LeagueInfo;
 import op.gg.project.league.model.service.LeagueService;
+import op.gg.project.summoner.model.dto.Match;
 import op.gg.project.summoner.model.dto.Summoner;
 import op.gg.project.summoner.model.service.SummonerService;
 
@@ -85,4 +87,99 @@ public class LeagueController {
 		
 		return leagueList;
 	}
+	
+
+	//소환사 게임 목록
+	@CrossOrigin(origins = "http://localhost")
+	@GetMapping("/matchList")
+	public String getMatchList(String puuid, int page, int count) {
+
+		Account account = new Account();
+
+		System.out.println("page : "+page+"count : "+count);
+		System.out.println("puuid : "+puuid);
+		
+//		List<Match> matchs= new ArrayList<>();
+		
+		String apiUrl = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/"+puuid+"/ids?start="+page * count+"&count="+count+"&api_key="+account.getApiKey();
+		StringBuffer response = new StringBuffer();
+		try {
+			URL url = new URL(apiUrl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+
+			int responseCode = conn.getResponseCode();
+			System.out.println("Response Code : " + responseCode);
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String inputLine;
+
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			// 출력
+			System.out.println(response.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+		return response.toString();
+
+	}
+	
+	// 소환사가 한 경기의 디테일정보
+	
+	@CrossOrigin(origins = "http://localhost")
+	@GetMapping("/matchDetail")
+	public String getMatchDetail(String matchId) {
+		
+		Account account = new Account();
+		
+		String apiUrl = "https://asia.api.riotgames.com/lol/match/v5/matches/"+matchId+"?api_key="+account.getApiKey();
+		StringBuffer response = new StringBuffer();
+		
+		try {
+			URL url = new URL(apiUrl);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+
+			int responseCode = conn.getResponseCode();
+			if (responseCode == 429) {
+			    String retryAfter = conn.getHeaderField("Retry-After");
+			    long retryAfterSeconds = Long.parseLong(retryAfter);
+			    // retryAfterSeconds 만큼 대기 후 재시도 로직
+			}
+			System.out.println("Response Code : " + responseCode);
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			String inputLine;
+			
+			if (responseCode != HttpURLConnection.HTTP_OK) {
+			    // 에러 로그 찍기 또는 에러 메시지 반환
+			    System.out.println("Request Failed. HTTP Error Code: " + responseCode);
+			    return null; // 또는 적절한 에러 메시지 반환
+			}
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			// 출력
+		
+
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		return response.toString();
+	}
+	
 }
+

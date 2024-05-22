@@ -189,7 +189,6 @@ public class LeagueController {
 			e.printStackTrace();
 		}
 		
-		System.out.println(response.toString());
 		
 //		return response.toString();
 		return new ResponseEntity<>(response.toString(), headers, HttpStatus.OK);
@@ -214,7 +213,6 @@ public class LeagueController {
 		ResponseEntity<Summoner[]> response = restTemplate.getForEntity(url, Summoner[].class);
 
 		Summoner[] challengers = response.getBody();
-		System.out.println("challengers"+challengers.length);
 //		System.out.println(Arrays.copyOfRange(challengers, (page - 1) * 100, page * 100));
 		
 		/*
